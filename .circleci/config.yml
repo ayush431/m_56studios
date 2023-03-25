@@ -1,0 +1,29 @@
+
+version: 2
+jobs:
+  build:
+    branches:
+      only:
+        - dev
+        - master
+    docker:
+      - image: circleci/python:3.8.8
+    working_directory: ~/repo
+    environment:
+      - IMG_NAME: magure/magure:m56studios_be
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Docker Build
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS &&
+            cd ~/repo && 
+            if [ "$CIRCLE_BRANCH" = "master" ]
+            then
+               docker build -t ${IMG_NAME} .
+               docker push ${IMG_NAME}
+            else
+              docker build -t ${IMG_NAME}-${CIRCLE_BRANCH} .
+              docker push ${IMG_NAME}-${CIRCLE_BRANCH}
+            fi

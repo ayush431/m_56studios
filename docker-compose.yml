@@ -1,0 +1,76 @@
+version: '2'
+services:
+  be:
+    image: magure/magure:m56studios_be
+    environment:
+      DEBUG: 'True'
+      DBNAME: m56
+      DBUSER: root
+      PASSWORD: M@gure123
+      HOST: mysql
+      PORT: '3306'
+      ALLOWD_HOST: '*'
+      BUCKET_NAME: '<bucket-nmae>'
+      REGION_NAME: 'us-east-2'
+      AWS_ACCESS_KEY_ID: 'AKEYMYOY5VPSLKGI54F'
+      AWS_SECRET_ACCESS_KEY: 'secretKey/hj/oBuejTixgJSP2yiHUvCA+xhQ'
+      BASE_URL: 'https://mket.s3.us-east-2.amazonaws.com'
+      stdin_open: true
+    tty: true
+    links:
+    - mysql:mysql
+    depends_on:
+    - mysql
+    ports:
+    - 8001:8001
+    volumes:
+    - /task-logs/log.log:log.log
+  worker:
+    image: magure/magure:m56studios_be
+    environment:
+      DEBUG: 'True'
+      DBNAME: m56
+      DBUSER: root
+      PASSWORD: M@gure123
+      HOST: mysql
+      PORT: '3306'
+      ALLOWD_HOST: '*'
+      BUCKET_NAME: '<bucket-nmae>'
+      REGION_NAME: 'us-east-2'
+      AWS_ACCESS_KEY_ID: 'AKEYMYOY5VPSLKGI54F'
+      AWS_SECRET_ACCESS_KEY: 'secretKey/hj/oBuejTixgJSP2yiHUvCA+xhQ'
+      BASE_URL: 'https://mket.s3.us-east-2.amazonaws.com'
+    stdin_open: true
+    tty: true
+    links:
+    - mysql:mysql
+    depends_on:
+    - mysql
+    volumes:
+    - /task-logs/log.log:log/log.log
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: M@gure123
+      DB_NAME: m56
+    stdin_open: true
+    volumes:
+    - /db_m56:/var/lib/mysql
+    tty: true
+    ports:
+      - 3306:3306
+  corsanywhere:
+    image: magure/magure:m56studios_cors
+    stdin_open: true
+    tty: true
+    ports:
+    - 8080:8080
+  fe:
+    image: magure/magure:m56studios_fe
+    stdin_open: true
+    tty: true
+    ports:
+    - 8002:80
+    environment:
+      VUE_APP_BASE_API_URL: 'http://54.176.65.31/api/'
+      VUE_APP_CORS_BASE_URL: 'http://54.176.65.31/cors/'
